@@ -1,0 +1,41 @@
+library(tidyverse)
+library(Hmisc)
+library(AICcmodavg)
+library(car)
+install.packages("GGally")
+library(GGally)
+install.packages("readxl")
+library(readxl)
+install.packages("rcompanion")
+library(rcompanion)
+library(MASS)
+install.packages("MASS")
+
+
+Pj3data<- read.csv("Lyme_Rates_by_State.csv")
+
+# Filter Alaska data
+AlaskaData <- Pj3data[Pj3data$State == "Alaska", ]
+
+# BarChart
+barchart <- ggplot() +
+  geom_col(data = AlaskaData, aes(x = factor(1), y = X2009), fill = "blue", position = "dodge") +
+  geom_col(data = AlaskaData, aes(x = factor(2), y = X2016), fill = "red", position = "dodge") +
+  scale_x_discrete(labels = c("2009", "2016")) +
+  labs(title = "Lyme Disease Rates in Alaska",
+       x = "Year",
+       y = "Rate") +
+  theme_minimal()
+barchart
+
+control_rate <- AlaskaData$X2009
+
+successes <- sum(AlaskaData$X2016 > AlaskaData$X2009)
+trials <- nrow(AlaskaData)
+
+# binomial test
+binom_test_result <- binom.test(successes,trials,p =control_rate , alternative = "greater")
+
+#binomial test result
+print(binom_test_result)
+
